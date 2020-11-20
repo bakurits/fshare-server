@@ -42,8 +42,9 @@ func main() {
 	}
 
 	s := &server.Server{
-		AuthConfig: auth.GetConfig(conf.ClientID, conf.ClientSecret, conf.Server+"/auth"),
-		Repository: repository,
+		AuthConfig:    auth.GetConfig(conf.ClientID, conf.ClientSecret, conf.Server+"/auth"),
+		Repository:    repository,
+		StaticFileDir: "static",
 	}
 	s.Init()
 
