@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/bakurits/fileshare/pkg/webapp/db"
+	"github.com/bakurits/fshare-server/db"
 
 	"github.com/bakurits/ph"
 	"github.com/gin-gonic/contrib/sessions"

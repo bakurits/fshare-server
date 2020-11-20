@@ -3,12 +3,14 @@ package server
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"github.com/bakurits/fileshare/pkg/webapp/db"
-	"github.com/gin-gonic/contrib/sessions"
-	"github.com/gin-gonic/gin"
 	"html/template"
 	"log"
 	"net/http"
+
+	"github.com/bakurits/fshare-server/db"
+
+	"github.com/gin-gonic/contrib/sessions"
+	"github.com/gin-gonic/gin"
 )
 
 func randToken() string {
