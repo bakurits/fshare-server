@@ -13,7 +13,6 @@ import (
 )
 
 func (s *Server) homePageHandler() handlerWithUser {
-
 	type Homepage struct {
 		Email         string
 		IsPasswordSet bool
@@ -22,7 +21,6 @@ func (s *Server) homePageHandler() handlerWithUser {
 	return func(user db.User, c *gin.Context) {
 		s.executeTemplate(c.Writer, Homepage{Email: user.Email, IsPasswordSet: user.Password != ""}, true, "homepage")
 	}
-
 }
 
 func (s *Server) changePasswordPageHandler() handlerWithUser {
@@ -63,11 +61,9 @@ func (s *Server) changePasswordHandler() handlerWithUser {
 
 		c.Redirect(http.StatusSeeOther, "/")
 	}
-
 }
 
 func (s *Server) loginPageHandler() gin.HandlerFunc {
-
 	type LoginResponse struct {
 		AuthLink string
 	}
@@ -85,6 +81,7 @@ func (s *Server) loginPageHandler() gin.HandlerFunc {
 		s.executeTemplate(c.Writer, LoginResponse{AuthLink: s.getLoginURL(state)}, true, "login")
 	}
 }
+
 func (s *Server) loginHandler() gin.HandlerFunc {
 	type PostForm struct {
 		Email    string `schema:"email"`
@@ -116,6 +113,7 @@ func (s *Server) loginHandler() gin.HandlerFunc {
 		c.Redirect(http.StatusSeeOther, "/")
 	}
 }
+
 func (s *Server) logoutHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
@@ -123,7 +121,6 @@ func (s *Server) logoutHandler() gin.HandlerFunc {
 		_ = session.Save()
 		c.Redirect(http.StatusSeeOther, "/")
 	}
-
 }
 
 func (s *Server) authHandler() gin.HandlerFunc {
@@ -154,7 +151,6 @@ func (s *Server) authHandler() gin.HandlerFunc {
 }
 
 func (s *Server) setPasswordHandler() gin.HandlerFunc {
-
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 		email := s.getEmailFromPasswordRecoveryRequest(c)
