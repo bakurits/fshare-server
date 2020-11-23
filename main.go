@@ -7,7 +7,7 @@ import (
 	"github.com/bakurits/fshare-server/db"
 	"github.com/bakurits/fshare-server/server"
 
-	"github.com/bakurits/fileshare/pkg/auth"
+	"github.com/bakurits/fshare-common/auth"
 	"github.com/sethvargo/go-envconfig"
 	"google.golang.org/appengine"
 )

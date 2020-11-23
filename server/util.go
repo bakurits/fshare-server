@@ -62,7 +62,6 @@ func (s *Server) executeTemplate(w http.ResponseWriter, data interface{}, withLa
 	if err != nil {
 		log.Println(err)
 	}
-
 }
 
 func (s *Server) getEmailFromPasswordRecoveryRequest(c *gin.Context) string {

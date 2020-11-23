@@ -1,17 +1,15 @@
 package server
 
 import (
-	"github.com/bakurits/fshare-server/db"
 	"net/http"
 
-	"github.com/bakurits/fileshare/pkg/auth"
+	"github.com/bakurits/fshare-server/db"
 
+	"github.com/bakurits/fshare-common/auth"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/schema"
 )
-
-const GetTokenEndpoint = "/api/token"
 
 var schemaDecoder = schema.NewDecoder()
 
@@ -50,7 +48,7 @@ func (s *Server) Init() {
 
 	router.Static("static", s.StaticFileDir)
 
-	router.GET(GetTokenEndpoint, s.getUserTokenHandler())
+	router.GET("/api/token", s.getUserTokenHandler())
 
 	s.r = router
 }
