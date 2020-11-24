@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 
@@ -9,10 +10,9 @@ import (
 
 	"github.com/bakurits/fshare-common/auth"
 	"github.com/sethvargo/go-envconfig"
-	"google.golang.org/appengine"
 )
 
-type Config struct {
+type config struct {
 	CredentialsDir string `env:"credentials_dir"`
 
 	ConnectionString string `env:"connection_string"`
@@ -27,11 +27,8 @@ type Config struct {
 }
 
 func main() {
-	log.Println("starting")
-	ctx := appengine.BackgroundContext()
-
-	var conf Config
-	if err := envconfig.Process(ctx, &conf); err != nil {
+	var conf config
+	if err := envconfig.Process(context.Background(), &conf); err != nil {
 		log.Fatal(err)
 	}
 
