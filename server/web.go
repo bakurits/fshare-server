@@ -195,6 +195,7 @@ func (s *Server) passwordRecoveryRequestHandler() gin.HandlerFunc {
 			_ = c.AbortWithError(http.StatusInternalServerError, errors.New("internal server error"))
 			return
 		}
-		fmt.Printf("http://localhost:8080/password-recovery?token=%s", token)
+
+		sendMail("Password Recovery", fmt.Sprintf("http://localhost:8080/password-recovery?token=%s", token), req.Email)
 	}
 }

@@ -3,6 +3,7 @@ package server
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -76,4 +77,8 @@ func (s *Server) getEmailFromPasswordRecoveryRequest(c *gin.Context) string {
 		email = session.Get(EmailSessionKey).(string)
 	}
 	return email
+}
+
+func sendMail(subject, body string, addr ...string) {
+	fmt.Println(body)
 }
