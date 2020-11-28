@@ -26,8 +26,8 @@ type config struct {
 	ClientSecret string `env:"client_secret"`
 	ProjectID    string `env:"project_id"`
 
-	Email    string `env:"email"`
-	Password string `env:"password"`
+	Email         string `env:"email"`
+	EmailPassword string `env:"email_password"`
 }
 
 func main() {
@@ -48,7 +48,7 @@ func main() {
 		StaticFileDir: "static",
 		MailSender: &mail.SenderMail{
 			Email:    conf.Email,
-			Password: conf.Password,
+			Password: conf.EmailPassword,
 		},
 	}
 	s.Init()
