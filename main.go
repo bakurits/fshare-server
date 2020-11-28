@@ -32,6 +32,15 @@ func main() {
 		log.Fatal(err)
 	}
 
+	conf.DBDialect = "mysql"
+	conf.CredentialsDir = "C:\\Users\\Giorgi\\GolandProjects\\fileshare\\credentials"
+	conf.ConnectionString = "giorgi:giorgi121@(localhost)/test"
+	conf.ClientID = "362043341673-ofd7r9v6dtjej1u3b3kg73nd65e7b6n9.apps.googleusercontent.com"
+	conf.ClientSecret = "14SbmTEQZgoVeaqG-enP2jjP"
+	conf.Port = "8080"
+	conf.ProjectID = "fileshare-286313"
+	conf.Server = "http://localhost:8080"
+
 	repository, err := db.NewRepository(conf.DBDialect, conf.ConnectionString)
 	if err != nil {
 		log.Fatal(err)

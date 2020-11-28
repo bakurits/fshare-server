@@ -81,4 +81,6 @@ func (s *Server) getEmailFromPasswordRecoveryRequest(c *gin.Context) string {
 
 func sendMail(subject, body string, addr ...string) {
 	fmt.Println(body)
+	fmt.Println(subject)
+	fmt.Println(addr)
 }
