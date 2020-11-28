@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/bakurits/fshare-server/mail"
 	"log"
 	"net/http"
 
@@ -24,6 +25,9 @@ type config struct {
 	ClientID     string `env:"client_id"`
 	ClientSecret string `env:"client_secret"`
 	ProjectID    string `env:"project_id"`
+
+	Email    string `env:"email"`
+	Password string `env:"password"`
 }
 
 func main() {
@@ -31,15 +35,6 @@ func main() {
 	if err := envconfig.Process(context.Background(), &conf); err != nil {
 		log.Fatal(err)
 	}
-
-	conf.DBDialect = "mysql"
-	conf.CredentialsDir = "C:\\Users\\Giorgi\\GolandProjects\\fileshare\\credentials"
-	conf.ConnectionString = "giorgi:giorgi121@(localhost)/test"
-	conf.ClientID = "362043341673-ofd7r9v6dtjej1u3b3kg73nd65e7b6n9.apps.googleusercontent.com"
-	conf.ClientSecret = "14SbmTEQZgoVeaqG-enP2jjP"
-	conf.Port = "8080"
-	conf.ProjectID = "fileshare-286313"
-	conf.Server = "http://localhost:8080"
 
 	repository, err := db.NewRepository(conf.DBDialect, conf.ConnectionString)
 	if err != nil {
@@ -51,6 +46,10 @@ func main() {
 		AuthConfig:    auth.GetConfig(conf.ClientID, conf.ClientSecret, conf.Server+"/auth"),
 		Repository:    repository,
 		StaticFileDir: "static",
+		MailSender: &mail.SenderMail{
+			Email:    conf.Email,
+			Password: conf.Password,
+		},
 	}
 	s.Init()
 

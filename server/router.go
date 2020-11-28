@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/bakurits/fshare-server/mail"
 	"net/http"
 
 	"github.com/bakurits/fshare-server/db"
@@ -21,6 +22,8 @@ type Server struct {
 
 	Repository    *db.Repository
 	StaticFileDir string
+
+	MailSender *mail.SenderMail
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {

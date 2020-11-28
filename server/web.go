@@ -196,6 +196,10 @@ func (s *Server) passwordRecoveryRequestHandler() gin.HandlerFunc {
 			return
 		}
 
-		sendMail("Password Recovery", fmt.Sprintf("http://localhost:8080/password-recovery?token=%s", token), req.Email)
+		err = s.MailSender.SendMail("Password Recovery", fmt.Sprintf("http://localhost:8080/password-recovery?token=%s", token), req.Email)
+
+		if err != nil {
+			fmt.Println("mail was not send")
+		}
 	}
 }

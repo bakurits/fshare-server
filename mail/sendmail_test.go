@@ -7,8 +7,13 @@ import (
 
 func TestService_send(t *testing.T) {
 	is := assert.New(t)
-	err := SendMail(
-		"test mail", "test subject", "giorgi.baghdavadze@optio.ai",
-		"giorgi121", "gbagh16@freeuni.edu.ge", "giorgi.baghdavadze@optio.ai")
+	mailSender := SenderMail{
+		Email:    "giorgi.baghdavadze@optio.ai",
+		Password: "giorgi121",
+	}
+
+	err := mailSender.SendMail(
+		"test mail", "test subject",
+		"gbagh16@freeuni.edu.ge", "giorgi.baghdavadze@optio.ai", "bakuricucxashvili@gmail.com")
 	is.NoError(err)
 }
