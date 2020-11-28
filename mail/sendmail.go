@@ -18,6 +18,7 @@ func (s *SenderMail) SendMail(subject, body string, addr ...string) error {
 	m.SetHeader("To", addr...)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/plain", body)
+
 	d := gomail.NewDialer(MAILHOST, MAILPORT, s.Email, s.Password)
 	if err := d.DialAndSend(m); err != nil {
 		return err
