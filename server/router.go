@@ -19,7 +19,7 @@ type Server struct {
 
 	AuthConfig *auth.Config
 
-	Repository    db.Repository
+	Repository    *db.Repository
 	StaticFileDir string
 }
 
@@ -43,6 +43,11 @@ func (s *Server) Init() {
 	router.POST("/change-password", s.userExtractorMiddleware(s.changePasswordHandler()))
 
 	router.POST("/logout", s.logoutHandler())
+
+	router.GET("/password-recovery-request", s.passwordRecoveryRequestPageHandler())
+	router.POST("/password-recovery-request", s.passwordRecoveryRequestHandler())
+
+	router.GET("/password-recovery", s.emailPasswordRecoveryHandler())
 
 	router.GET("/auth", s.authHandler())
 

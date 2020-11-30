@@ -15,7 +15,7 @@ func (s *Server) getUserTokenHandler() gin.HandlerFunc {
 			return
 		}
 
-		user, err := s.Repository.GetUser(email)
+		user, err := s.Repository.Users.Get(email)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{})
 			return
