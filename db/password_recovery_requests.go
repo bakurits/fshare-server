@@ -18,8 +18,9 @@ type PasswordRecoveryRequest struct {
 
 // PasswordRecoveryRequestStore API for password recovery request's store
 type PasswordRecoveryRequestStore interface {
-	Get(email string) (PasswordRecoveryRequest, error)
+	Get(token string) (PasswordRecoveryRequest, error)
 	Add(req PasswordRecoveryRequest) error
+	Delete(token string) error
 	DeleteOld() error
 }
 
@@ -41,10 +42,19 @@ func (s *passwordRecoveryRequestStore) Get(token string) (prr PasswordRecoveryRe
 }
 
 func (s *passwordRecoveryRequestStore) Add(req PasswordRecoveryRequest) error {
+	req.RequestDate = time.Now()
 	if err := s.db.Create(req).Error; err != nil {
 		return errors.Wrap(err, "error while adding new password restore request")
 	}
 	time.AfterFunc(deleteAfter, func() { s.db.Delete(PasswordRecoveryRequest{Email: req.Email}) })
+	return nil
+}
+
+func (s *passwordRecoveryRequestStore) Delete(token string) error {
+	var r PasswordRecoveryRequest
+	if err := s.db.Where("token = ?", token).Delete(&r).Error; err != nil {
+		return errors.Wrap(err, "error while deleting password restore request")
+	}
 	return nil
 }
 
