@@ -8,7 +8,7 @@ import (
 
 func TestService_send(t *testing.T) {
 	is := assert.New(t)
-	mailSender := SenderMail{
+	mailSender := Sender{
 		Email:    "giorgi.baghdavadze@optio.ai",
 		Password: "giorgi121",
 	}

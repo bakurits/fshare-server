@@ -7,12 +7,12 @@ import (
 const MAILHOST = "smtp.gmail.com"
 const MAILPORT = 587
 
-type SenderMail struct {
+type Sender struct {
 	Email    string
 	Password string
 }
 
-func (s *SenderMail) SendMail(subject, body string, addr ...string) error {
+func (s *Sender) SendMail(subject, body string, addr ...string) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From", s.Email)
 	m.SetHeader("To", addr...)

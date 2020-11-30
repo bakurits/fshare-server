@@ -23,7 +23,7 @@ type Server struct {
 	Repository    *db.Repository
 	StaticFileDir string
 
-	MailSender *mail.SenderMail
+	MailSender *mail.Sender
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {

@@ -46,7 +46,7 @@ func main() {
 		AuthConfig:    auth.GetConfig(conf.ClientID, conf.ClientSecret, conf.Server+"/auth"),
 		Repository:    repository,
 		StaticFileDir: "static",
-		MailSender: &mail.SenderMail{
+		MailSender: &mail.Sender{
 			Email:    conf.Email,
 			Password: conf.EmailPassword,
 		},
