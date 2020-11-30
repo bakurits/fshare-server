@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/bakurits/fshare-server/db"
+	"github.com/bakurits/fshare-server/mail"
 	"github.com/bakurits/fshare-server/server"
 
 	"github.com/bakurits/fshare-common/auth"
@@ -24,6 +25,9 @@ type config struct {
 	ClientID     string `env:"client_id"`
 	ClientSecret string `env:"client_secret"`
 	ProjectID    string `env:"project_id"`
+
+	Email         string `env:"email"`
+	EmailPassword string `env:"email_password"`
 }
 
 func main() {
@@ -42,6 +46,10 @@ func main() {
 		AuthConfig:    auth.GetConfig(conf.ClientID, conf.ClientSecret, conf.Server+"/auth"),
 		Repository:    repository,
 		StaticFileDir: "static",
+		MailSender: &mail.Sender{
+			Email:    conf.Email,
+			Password: conf.EmailPassword,
+		},
 	}
 	s.Init()
 

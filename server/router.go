@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/bakurits/fshare-server/db"
+	"github.com/bakurits/fshare-server/mail"
 
 	"github.com/bakurits/fshare-common/auth"
 	"github.com/gin-gonic/contrib/sessions"
@@ -21,6 +22,8 @@ type Server struct {
 
 	Repository    *db.Repository
 	StaticFileDir string
+
+	MailSender *mail.Sender
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
