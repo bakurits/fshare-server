@@ -71,9 +71,16 @@ func (s *Server) getEmailFromPasswordRecoveryRequest(c *gin.Context) string {
 		info, err := s.Repository.PasswordRestoreRequests.Get(token)
 		if err == nil {
 			email = info.Email
+			logError(s.Repository.PasswordRestoreRequests.Delete(token))
 		}
 	} else {
 		email = session.Get(EmailSessionKey).(string)
 	}
 	return email
+}
+
+func logError(err error) {
+	if err != nil {
+		log.Println(err)
+	}
 }
