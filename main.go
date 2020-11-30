@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
-	"github.com/bakurits/fshare-server/mail"
 	"log"
 	"net/http"
 
 	"github.com/bakurits/fshare-server/db"
+	"github.com/bakurits/fshare-server/mail"
 	"github.com/bakurits/fshare-server/server"
 
 	"github.com/bakurits/fshare-common/auth"

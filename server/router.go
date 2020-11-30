@@ -1,10 +1,10 @@
 package server
 
 import (
-	"github.com/bakurits/fshare-server/mail"
 	"net/http"
 
 	"github.com/bakurits/fshare-server/db"
+	"github.com/bakurits/fshare-server/mail"
 
 	"github.com/bakurits/fshare-common/auth"
 	"github.com/gin-gonic/contrib/sessions"
