@@ -60,7 +60,7 @@ func (s *Server) loginHandler() gin.HandlerFunc {
 			_ = c.AbortWithError(http.StatusBadRequest, errors.New("bad request"))
 			return
 		}
-		u, err := s.Repository.Users.Get(req.Email)
+		u, err := s.Repository.Users.Get(c.Request.Context(), req.Email)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusUnauthorized, errors.New("user doesn't exists"))
 			return
@@ -100,11 +100,12 @@ func (s *Server) authHandler() gin.HandlerFunc {
 			return
 		}
 
-		_ = s.Repository.Users.Add(db.User{
-			Email:    client.Email,
-			Password: "",
-			Token:    db.TokenStore(*client.Token),
-		})
+		_ = s.Repository.Users.Add(c.Request.Context(),
+			db.User{
+				Email:    client.Email,
+				Password: "",
+				Token:    client.Token,
+			})
 
 		session.Set(EmailSessionKey, client.Email)
 		_ = session.Save()
@@ -143,10 +144,11 @@ func (s *Server) changePasswordHandler() handlerWithUser {
 			_ = c.AbortWithError(http.StatusInternalServerError, errors.New("internal server error"))
 			return
 		}
-		_ = s.Repository.Users.Update(db.User{
-			Email:    u.Email,
-			Password: passHash,
-		})
+		_ = s.Repository.Users.Update(c.Request.Context(),
+			db.User{
+				Email:    u.Email,
+				Password: passHash,
+			})
 
 		c.Redirect(http.StatusSeeOther, "/")
 	}
@@ -188,10 +190,11 @@ func (s *Server) passwordRecoveryRequestHandler() gin.HandlerFunc {
 			return
 		}
 		token := uuid.New().String()
-		err := s.Repository.PasswordRestoreRequests.Add(db.PasswordRecoveryRequest{
-			Token: token,
-			Email: req.Email,
-		})
+		err := s.Repository.PasswordRestoreRequests.Add(c.Request.Context(),
+			db.PasswordRecoveryRequest{
+				Token: token,
+				Email: req.Email,
+			})
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, errors.New("internal server error"))
 			return
