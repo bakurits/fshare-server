@@ -9,7 +9,6 @@ import (
 )
 
 const (
-	deleteAfter       = time.Minute * 30
 	prrCollectionName = "prr"
 )
 
@@ -37,7 +36,8 @@ type passwordRecoveryRequestStore struct {
 }
 
 func (s *passwordRecoveryRequestStore) Get(ctx context.Context, token string) (prr PasswordRecoveryRequest, err error) {
-	doc, err := s.client.Collection(prrCollectionName).Doc(token).Get(ctx)
+	var doc *firestore.DocumentSnapshot
+	doc, err = s.client.Collection(prrCollectionName).Doc(token).Get(ctx)
 	if err != nil {
 		return PasswordRecoveryRequest{}, errors.Wrap(err, "error while retrieving recovery request")
 	}
