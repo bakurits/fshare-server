@@ -42,8 +42,7 @@ func main() {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 	defer func() {
-		err := client.Close()
-		if err != nil {
+		if err = client.Close(); err != nil {
 			log.Println(err)
 		}
 	}()
