@@ -97,11 +97,11 @@ func (s *userStore) Update(ctx context.Context, user User) error {
 	_, err = s.client.Collection("users").Doc(user.Email).Update(ctx,
 		[]firestore.Update{
 			{
-				Path:  "password",
+				Path:  "Password",
 				Value: u.Password,
 			},
 			{
-				Path:  "token",
+				Path:  "Token",
 				Value: u.Token,
 			},
 		},
