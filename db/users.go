@@ -1,76 +1,112 @@
 package db
 
 import (
-	"database/sql/driver"
+	"context"
 	"encoding/json"
-	"fmt"
 
+	"cloud.google.com/go/firestore"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
-	"gorm.io/gorm"
 )
-
-// TokenStore wraper on oauth2.Token for storing in db
-type TokenStore oauth2.Token
 
 // User db model for users
 type User struct {
-	Email    string `gorm:"primaryKey"`
+	Email    string
 	Password string
-	Token    TokenStore
+	Token    *oauth2.Token
 }
 
-// Scan scan value into TokenStore, implements sql.Scanner interface
-func (t *TokenStore) Scan(value interface{}) error {
-	b, ok := value.([]byte)
-	if !ok {
-		return errors.New(fmt.Sprint("failed to unmarshal TokenStore value:", value))
+type userFireStoreModel struct {
+	Email    string
+	Password string
+	Token    []byte
+}
+
+func userToFirestore(user User) (userFireStoreModel, error) {
+	t, err := json.Marshal(user.Token)
+	if err != nil {
+		return userFireStoreModel{}, err
 	}
-
-	result := TokenStore{}
-	err := json.Unmarshal(b, &result)
-	*t = result
-	return err
+	return userFireStoreModel{
+		Email:    user.Email,
+		Password: user.Password,
+		Token:    t,
+	}, nil
 }
 
-// Value return json value, implement driver.Valuer interface
-func (t TokenStore) Value() (driver.Value, error) {
-	return json.Marshal(t)
+func firestoreToUser(user userFireStoreModel) (User, error) {
+	var t oauth2.Token
+	if err := json.Unmarshal(user.Token, &t); err != nil {
+		return User{}, err
+	}
+	return User{
+		Email:    user.Email,
+		Password: user.Password,
+		Token:    &t,
+	}, nil
 }
 
 // UserStore API for user's store
 type UserStore interface {
-	Get(string) (User, error)
-	Add(User) error
-	Update(user User) error
+	Get(context.Context, string) (User, error)
+	Add(context.Context, User) error
+	Update(context.Context, User) error
 }
 
 // NewUserStore returns new UserStore instance
-func NewUserStore(db *gorm.DB) UserStore {
-	return &userStore{db: db}
+func NewUserStore(client *firestore.Client) UserStore {
+	return &userStore{client: client}
 }
 
 type userStore struct {
-	db *gorm.DB
+	client *firestore.Client
 }
 
-func (s *userStore) Get(email string) (User, error) {
-	var u User
-	if err := s.db.Where("email = ?", email).First(&u).Error; err != nil {
-		return u, errors.Wrap(err, "error while getting token")
+func (s *userStore) Get(ctx context.Context, email string) (User, error) {
+	doc, err := s.client.Collection("users").Doc(email).Get(ctx)
+	if err != nil {
+		return User{}, errors.Wrap(err, "error while retrieving user")
 	}
-	return u, nil
+
+	var u userFireStoreModel
+	if err := doc.DataTo(&u); err != nil {
+		return User{}, errors.Wrap(err, "error while retrieving user")
+	}
+	return firestoreToUser(u)
 }
 
-func (s *userStore) Add(user User) error {
-	if err := s.db.Create(user).Error; err != nil {
+func (s *userStore) Add(ctx context.Context, user User) error {
+	u, err := userToFirestore(user)
+	if err != nil {
+		return errors.Wrap(err, "error while adding new user")
+	}
+
+	_, err = s.client.Collection("users").Doc(user.Email).Create(ctx, u)
+	if err != nil {
 		return errors.Wrap(err, "error while adding new user")
 	}
 	return nil
 }
 
-func (s *userStore) Update(user User) error {
-	if err := s.db.Updates(user).Error; err != nil {
+func (s *userStore) Update(ctx context.Context, user User) error {
+	u, err := userToFirestore(user)
+	if err != nil {
+		return errors.Wrap(err, "error while updating user")
+	}
+
+	_, err = s.client.Collection("users").Doc(user.Email).Update(ctx,
+		[]firestore.Update{
+			{
+				Path:  "Password",
+				Value: u.Password,
+			},
+			{
+				Path:  "Token",
+				Value: u.Token,
+			},
+		},
+	)
+	if err != nil {
 		return errors.Wrap(err, "error while updating user")
 	}
 	return nil

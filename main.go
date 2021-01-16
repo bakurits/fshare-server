@@ -9,6 +9,7 @@ import (
 	"github.com/bakurits/fshare-server/mail"
 	"github.com/bakurits/fshare-server/server"
 
+	"cloud.google.com/go/firestore"
 	"github.com/bakurits/fshare-common/auth"
 	"github.com/sethvargo/go-envconfig"
 )
@@ -36,7 +37,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	repository, err := db.NewRepository(conf.DBDialect, conf.ConnectionString)
+	client, err := firestore.NewClient(context.Background(), conf.ProjectID)
+	if err != nil {
+		log.Fatalf("Failed to create client: %v", err)
+	}
+	defer func() {
+		if err = client.Close(); err != nil {
+			log.Println(err)
+		}
+	}()
+
+	repository, err := db.NewRepository(client)
 	if err != nil {
 		log.Fatal(err)
 		return

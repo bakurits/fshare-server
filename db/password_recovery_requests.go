@@ -1,13 +1,16 @@
 package db
 
 import (
+	"context"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	"github.com/pkg/errors"
-	"gorm.io/gorm"
 )
 
-const deleteAfter = time.Minute * 30
+const (
+	prrCollectionName = "prr"
+)
 
 // PasswordRecoveryRequest stores data about password recovery requests
 type PasswordRecoveryRequest struct {
@@ -18,50 +21,45 @@ type PasswordRecoveryRequest struct {
 
 // PasswordRecoveryRequestStore API for password recovery request's store
 type PasswordRecoveryRequestStore interface {
-	Get(token string) (PasswordRecoveryRequest, error)
-	Add(req PasswordRecoveryRequest) error
-	Delete(token string) error
-	DeleteOld() error
+	Get(ctx context.Context, token string) (PasswordRecoveryRequest, error)
+	Add(ctx context.Context, req PasswordRecoveryRequest) error
+	Delete(ctx context.Context, token string) error
 }
 
 // NewPasswordRecoveryRequestStore returns new PasswordRecoveryRequestStore instance
-func NewPasswordRecoveryRequestStore(db *gorm.DB) PasswordRecoveryRequestStore {
-	return &passwordRecoveryRequestStore{db: db}
+func NewPasswordRecoveryRequestStore(client *firestore.Client) PasswordRecoveryRequestStore {
+	return &passwordRecoveryRequestStore{client: client}
 }
 
 type passwordRecoveryRequestStore struct {
-	db *gorm.DB
+	client *firestore.Client
 }
 
-func (s *passwordRecoveryRequestStore) Get(token string) (prr PasswordRecoveryRequest, err error) {
-	if err = s.db.Where("token = ?", token).First(&prr).Error; err != nil {
-		err = errors.Wrap(err, "error while getting token")
-		return
+func (s *passwordRecoveryRequestStore) Get(ctx context.Context, token string) (prr PasswordRecoveryRequest, err error) {
+	var doc *firestore.DocumentSnapshot
+	doc, err = s.client.Collection(prrCollectionName).Doc(token).Get(ctx)
+	if err != nil {
+		return PasswordRecoveryRequest{}, errors.Wrap(err, "error while retrieving recovery request")
+	}
+	if err = doc.DataTo(&prr); err != nil {
+		return PasswordRecoveryRequest{}, errors.Wrap(err, "error while retrieving recovery request")
 	}
 	return
 }
 
-func (s *passwordRecoveryRequestStore) Add(req PasswordRecoveryRequest) error {
+func (s *passwordRecoveryRequestStore) Add(ctx context.Context, req PasswordRecoveryRequest) error {
 	req.RequestDate = time.Now()
-	if err := s.db.Create(req).Error; err != nil {
-		return errors.Wrap(err, "error while adding new password restore request")
-	}
-	time.AfterFunc(deleteAfter, func() { s.db.Delete(PasswordRecoveryRequest{Email: req.Email}) })
-	return nil
-}
-
-func (s *passwordRecoveryRequestStore) Delete(token string) error {
-	var r PasswordRecoveryRequest
-	if err := s.db.Where("token = ?", token).Delete(&r).Error; err != nil {
-		return errors.Wrap(err, "error while deleting password restore request")
+	_, err := s.client.Collection(prrCollectionName).Doc(req.Token).Create(ctx, req)
+	if err != nil {
+		return errors.Wrap(err, "error while adding recovery request")
 	}
 	return nil
 }
 
-func (s *passwordRecoveryRequestStore) DeleteOld() error {
-	var r PasswordRecoveryRequest
-	if err := s.db.Where("request_date < ?", time.Now().Add(-deleteAfter)).Delete(&r).Error; err != nil {
-		return errors.Wrap(err, "error while deleting old password restore requests")
+func (s *passwordRecoveryRequestStore) Delete(ctx context.Context, token string) error {
+	_, err := s.client.Collection(prrCollectionName).Doc(token).Delete(ctx)
+	if err != nil {
+		return errors.Wrap(err, "error while deleting recovery request")
 	}
 	return nil
 }

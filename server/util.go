@@ -32,7 +32,7 @@ func (s *Server) userExtractorMiddleware(handler handlerWithUser) gin.HandlerFun
 			return
 		}
 
-		u, err := s.Repository.Users.Get(email.(string))
+		u, err := s.Repository.Users.Get(c.Request.Context(), email.(string))
 		if err != nil {
 			c.Redirect(http.StatusSeeOther, "/login")
 			return
@@ -68,10 +68,10 @@ func (s *Server) getEmailFromPasswordRecoveryRequest(c *gin.Context) string {
 	session := sessions.Default(c)
 	email := ""
 	if token := c.Query("token"); token != "" {
-		info, err := s.Repository.PasswordRestoreRequests.Get(token)
+		info, err := s.Repository.PasswordRestoreRequests.Get(c.Request.Context(), token)
 		if err == nil {
 			email = info.Email
-			logError(s.Repository.PasswordRestoreRequests.Delete(token))
+			logError(s.Repository.PasswordRestoreRequests.Delete(c.Request.Context(), token))
 		}
 	} else {
 		email = session.Get(EmailSessionKey).(string)
