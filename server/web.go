@@ -144,7 +144,7 @@ func (s *Server) changePasswordHandler() handlerWithUser {
 			_ = c.AbortWithError(http.StatusInternalServerError, errors.New("internal server error"))
 			return
 		}
-		_ = s.Repository.Users.Update(c.Request.Context(),
+		_ = s.Repository.Users.UpdatePassword(c.Request.Context(),
 			db.User{
 				Email:    u.Email,
 				Password: passHash,
