@@ -50,7 +50,7 @@ func firestoreToUser(user userFireStoreModel) (User, error) {
 type UserStore interface {
 	Get(context.Context, string) (User, error)
 	Add(context.Context, User) error
-	Update(context.Context, User) error
+	UpdatePassword(context.Context, User) error
 }
 
 // NewUserStore returns new UserStore instance
@@ -88,7 +88,7 @@ func (s *userStore) Add(ctx context.Context, user User) error {
 	return nil
 }
 
-func (s *userStore) Update(ctx context.Context, user User) error {
+func (s *userStore) UpdatePassword(ctx context.Context, user User) error {
 	u, err := userToFirestore(user)
 	if err != nil {
 		return errors.Wrap(err, "error while updating user")
@@ -99,10 +99,6 @@ func (s *userStore) Update(ctx context.Context, user User) error {
 			{
 				Path:  "Password",
 				Value: u.Password,
-			},
-			{
-				Path:  "Token",
-				Value: u.Token,
 			},
 		},
 	)
